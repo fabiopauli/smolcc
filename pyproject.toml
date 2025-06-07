@@ -15,6 +15,9 @@ dependencies = [
     "smolagents",
     "python-dotenv",
     "litellm",
+    "openai",
+    "google-genai",
+    "tiktoken",
 ]
 scripts = { smolcc = "main:main" }
 

@@ -57,6 +57,11 @@ class GlobTool(Tool):
         # Find matching files and determine if results are truncated
         matching_files, truncated = self._find_matching_files(pattern, search_path, limit=100, offset=0)
         
+        # Smart fallback: if no results and pattern looks like a simple filename, try recursive search
+        if not matching_files and self._is_simple_filename_pattern(pattern):
+            recursive_pattern = f"**/{pattern}"
+            matching_files, truncated = self._find_matching_files(recursive_pattern, search_path, limit=100, offset=0)
+        
         # Format the result for the assistant
         result_str = self._format_result_for_assistant(matching_files, truncated)
         
@@ -142,6 +147,27 @@ class GlobTool(Tool):
         paginated_matches = all_matches[offset:offset + limit]
         
         return paginated_matches, truncated
+    
+    def _is_simple_filename_pattern(self, pattern: str) -> bool:
+        """
+        Check if a pattern looks like a simple filename that should be searched recursively.
+        
+        Args:
+            pattern: The glob pattern to analyze
+            
+        Returns:
+            True if pattern appears to be a simple filename search
+        """
+        # Don't apply fallback if pattern already has path separators or recursive markers
+        if "/" in pattern or "\\" in pattern or "**" in pattern:
+            return False
+            
+        # Don't apply fallback if pattern has complex glob characters at the start
+        if pattern.startswith("*") or pattern.startswith("?"):
+            return False
+            
+        # Pattern looks like a simple filename (possibly with extension wildcards)
+        return True
     
     def _format_result_for_assistant(self, files: List[str], truncated: bool) -> str:
         """

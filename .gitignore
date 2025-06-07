@@ -25,6 +25,7 @@ __pycache__/
 .pytest_cache/
 smolclaude/__pycache__/
 smolclaude/tools/__pycache__/
+council-logs/
 
 # Distribution / packaging
 *.egg-info/

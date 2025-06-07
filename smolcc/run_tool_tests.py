@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
     
     # Path to the test runner
-    test_dir = os.path.join("tools", "tests")
+    test_dir = os.path.join("smolcc", "tools", "tests")
     test_runner = os.path.join(test_dir, "run_tests.py")
     
     # Build command
