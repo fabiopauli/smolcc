@@ -7,15 +7,16 @@ from pathlib import Path
 
 
 def get_directory_structure(start_path, ignore_patterns=None):
-    """Generate a nested directory structure as a string."""
+    """Generate a nested directory structure as a string with clear root display."""
     if ignore_patterns is None:
-        ignore_patterns = ['.git', '__pycache__', '*.pyc']
+        ignore_patterns = ['.git', '__pycache__', '*.pyc', '.gitignore']
     
     # Get the working directory path
     cwd = Path(start_path).resolve()
     
-    # Create formatted string
-    structure = f"- {cwd}/\n"
+    # Create formatted string with a clear header indicating this is the current working directory
+    project_name = os.path.basename(cwd) or "root"
+    structure = f"- {cwd}/ (current working directory)\n"
     
     # We'll use a list to store the structure
     dir_structure = []

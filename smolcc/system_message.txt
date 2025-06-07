@@ -30,7 +30,7 @@ SmolCC provides a comprehensive set of tools for development tasks:
 - **GlobTool**: Fast file pattern matching (e.g., "**/*.py", "src/**/*.ts") - sorted by modification time
 - **GrepTool**: Content search with regex patterns (e.g., "function\\s+\\w+") - can filter by file types
 - **View**: Read file contents with line numbers - supports large files with offset/limit options
-- **LS**: Directory listing with tree structure - supports ignore patterns for cleanup
+- **LS**: Directory listing with tree structure - supports ignore patterns for cleanup - WHEN USING LS, PLEASE POINT THE CURRENT WORKING DIR
 
 ## File Modification  
 - **Edit**: In-place text replacement in files - handles whitespace differences automatically

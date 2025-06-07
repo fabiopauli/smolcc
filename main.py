@@ -2,6 +2,7 @@ import sys
 import os
 import argparse
 from smolcc import create_agent
+from smolcc.agent import refresh_agent_context
 
 def print_welcome():
     """Print welcome message with usage information."""
@@ -100,6 +101,28 @@ For more information, visit: https://github.com/aniemerg/smolcc
         # This covers `main.py -i` and `main.py --cwd /some/path`.
         run_interactive_mode(agent)
 
+def recreate_agent_with_cwd(new_cwd, current_agent=None):
+    """Recreate the agent with a new working directory and updated context."""
+    try:
+        os.chdir(new_cwd)
+        print(f"📁 Changed to working directory: {os.getcwd()}")
+        
+        # Try to use the more efficient refresh method if agent is provided
+        if current_agent is not None:
+            print("🔄 Refreshing agent context...")
+            updated_agent = refresh_agent_context(current_agent, os.getcwd())
+            print("✅ Agent context refreshed successfully")
+            return updated_agent
+        else:
+            # Fallback to full recreation
+            print("🔄 Creating new agent with directory context...")
+            agent = create_agent(os.getcwd())
+            print("✅ Agent context updated successfully")
+            return agent
+    except (FileNotFoundError, PermissionError) as e:
+        print(f"❌ Error: Cannot change to directory '{new_cwd}': {e}")
+        return None
+
 def run_interactive_mode(agent):
     """Run SmolCC in interactive mode, prompting for queries."""
     print("🚀 SmolCC Interactive Mode")
@@ -111,7 +134,7 @@ def run_interactive_mode(agent):
     print()
     print("💡 Useful commands:")
     print('   "help" - Show available tools and capabilities')
-    print('   "cd <path>" - Change working directory')
+    print('   "cd <path>" - Change working directory (updates agent context)')
     print('   "ls" or "dir" - List current directory contents')
     print()
     print("🔚 Type 'exit', 'quit', or press Ctrl+C to end")
@@ -130,6 +153,23 @@ def run_interactive_mode(agent):
             # Handle special built-in commands
             if query.lower() == "help":
                 print_help_commands()
+                continue
+            
+            # Handle cd command to change working directory
+            if query.strip().lower().startswith("cd "):
+                new_path = query.strip()[3:].strip()
+                if new_path:
+                    # Handle relative paths and expand ~
+                    new_path = os.path.expanduser(new_path)
+                    if not os.path.isabs(new_path):
+                        new_path = os.path.join(os.getcwd(), new_path)
+                    new_path = os.path.normpath(new_path)
+                    
+                    new_agent = recreate_agent_with_cwd(new_path, agent)
+                    if new_agent is not None:
+                        agent = new_agent
+                else:
+                    print("❌ Usage: cd <directory_path>")
                 continue
                 
             print("🤔 Processing...")
@@ -153,8 +193,9 @@ def print_help_commands():
     print()
     print("   📂 Directory Management:")
     print("      • List contents: 'what files are here?'")
-    print("      • Change directory: 'cd to the src folder'")
+    print("      • Change directory: 'cd /path/to/directory' or 'cd to the src folder'")
     print("      • Navigate: 'go to the parent directory'")
+    print("      • Note: Use 'cd <path>' for direct directory changes that update agent context")
     print()
     print("   🔍 Code Search & Analysis:")
     print("      • Find files: 'find all Python files'")

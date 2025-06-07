@@ -68,6 +68,19 @@ def get_available_tools():
     
     return tools
 
+def refresh_agent_context(agent, new_cwd=None):
+    """Refresh the agent's system prompt with updated directory context without full recreation."""
+    if new_cwd is None:
+        new_cwd = os.getcwd()
+    
+    # Generate new system prompt with updated context
+    new_system_prompt = get_system_prompt(new_cwd)
+    
+    # Update the model's system prompt
+    agent.model.system = new_system_prompt
+    
+    return agent
+
 def create_agent(cwd=None):
     """Create a tool-calling agent with the system prompt."""
     if cwd is None:
