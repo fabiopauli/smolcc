@@ -22,5 +22,4 @@ scripts = { smolcc = "main:main" }
 packages = ["smolcc", "smolcc.tools"]
 
 [tool.setuptools.package-data]
-"smolcc.tools" = ["*.py"]
 "smolcc" = ["system_message.txt"]
